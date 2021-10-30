@@ -211,6 +211,16 @@ website akan meminta username dan password sebelum membuka directory
 ### Soal
 Dan setiap kali mengakses IP Skypie akan dialihkan secara otomatis ke www.franky.yyy.com
 ### Penjelasan Jawaban
+Buka file `/etc/apache2/sites-available/000-default.conf` dan tambahkan:
+```Bash
+Redirect 301 / http://franky.D03.com/
+```
+sehingga filenya menjadi seperti:
+![image](https://user-images.githubusercontent.com/29938033/139524843-7aa63a04-b1d1-4347-b8b1-4272072c7204.png)
+Kemudian restart server dengan command `service apache2 restart`
+
+Tampilan website ketika dibuka di client Loguetown dengan `lynx 192.193.2.4`:
+![image](https://user-images.githubusercontent.com/29938033/139524870-97a1e3df-127a-4e50-bfff-4d9488fee434.png)
 
 ## No 17
 ### Soal
