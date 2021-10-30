@@ -93,12 +93,12 @@ Buat file .htacces di dalam folder /var/www/franky.D03.com dengan isi seperti be
 Di dalam file /etc/apache2/sites-available/franky.D03.com.conf tambahkan menjadi seperti berikut:
 ![Screenshot (488)](https://user-images.githubusercontent.com/74708771/139522302-52596f0f-885e-4c19-8e8c-dbb7ca3fee15.png)
 Restart service apache 2 `service apache2 restart`.
-
+![Screenshot (496)](https://user-images.githubusercontent.com/74708771/139522399-464ee2f0-2e40-48c8-8a62-64944540c4a8.png)
 
 Hasil website dibuka di client Loguetown dengan `lynx www.franky.D03.com/home`.
-[Screenshot (479)](https://user-images.githubusercontent.com/74708771/139522188-f4de71dd-c44d-412b-b6b1-7ecccea3b8ee.png)
+![Screenshot (479)](https://user-images.githubusercontent.com/74708771/139522188-f4de71dd-c44d-412b-b6b1-7ecccea3b8ee.png)
 
-## No 10!
+## No 10
 ### Soal
 Setelah itu, pada subdomain www.super.franky.yyy.com, Luffy membutuhkan penyimpanan aset yang memiliki DocumentRoot pada /var/www/super.franky.yyy.com
 ### Penjelasan Jawaban
