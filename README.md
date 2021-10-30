@@ -28,36 +28,140 @@
 ### Soal
 EniesLobby akan dijadikan sebagai DNS Master, Water7 akan dijadikan DNS Slave, dan Skypie akan digunakan sebagai Web Server. Terdapat 2 Client yaitu Loguetown, dan Alabasta. Semua node terhubung pada router Foosha, sehingga dapat mengakses internet
 ### Penjelasan Jawaban
+- Ketikkan `iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE -s [Prefix IP].0.0/16` pada root router Foosha
+- Melihat IP DNS pada foosha dengan mengetikkan `cat /etc/resolv.conf`
+- Pada setiap node, menambahkan IP server foosha dalam `/etc/resolv.conf` dengan command `echo nameserver [IP DNS] > /etc/resolv.conf`
+- Tes dengan ping google.com pada client server
+![image](https://user-images.githubusercontent.com/72771774/139524776-0f3a9eb0-ad38-4a50-a444-9e56a50383b0.png)
 
 ## No 2
 ### Soal
 Luffy ingin menghubungi Franky yang berada di EniesLobby dengan denden mushi. Kalian diminta Luffy untuk membuat website utama dengan mengakses franky.yyy.com dengan alias www.franky.yyy.com pada folder kaizoku
 ### Penjelasan Jawaban
+- Menambahkan konfigurasi di bawah kepada file /etc/bind/named.conf.local
+`zone "franky.D03.com" {
+	type master;
+	file "/etc/bind/kaizoku/franky.D03.com";
+};`
+-  Membuat folder kaizoku dengan command `mkdir /etc/bind/kaizoku`
+-  Copy file db.local ke franky.D03.com dengan command `cp /etc/bind/db.local /etc/bind/kaizoku/franky.D03.com`. Namun, dalam pengerjaan dapat langsung diletakkan ke dalam `setup.sh` pada root
+-  Edit file `/etc/bind/kaizoku/franky.D03.com`
+![image](https://user-images.githubusercontent.com/72771774/139524551-6c3e00b7-b875-46e4-a354-e1df37f7d18e.png)
+-  Restart dengan command `service bind9 restart`
+-  Ping franky.D03.com pada client server. Keterangan : nameserver pada `/etc/resolv.conf` diganti dengan IP EniesLobby sebagai DNS Masternya
+![image](https://user-images.githubusercontent.com/72771774/139524816-dd93384e-5535-4d09-9abd-da274a253fb4.png)
+-  Isi `setup.sh`
+![image](https://user-images.githubusercontent.com/72771774/139524874-9c550fd1-91c2-4e7c-9750-dbf08c9e273e.png)
+![image](https://user-images.githubusercontent.com/72771774/139524944-f4464162-349e-4916-a750-49ece9535ddd.png)
 
 ## No 3
 ### Soal
 Setelah itu buat subdomain super.franky.yyy.com dengan alias www.super.franky.yyy.com yang diatur DNS nya di EniesLobby dan mengarah ke Skypie
 ### Penjelasan Jawaban
+- Edit file `/etc/bind/kaizoku/franky.D03.com` seperti berikut
+![image](https://user-images.githubusercontent.com/72771774/139525022-e0e9d616-cf67-45e8-9a60-39bd2366f634.png)
+- Restart service `service bind9 restart`
+- Testing pada client server
+![image](https://user-images.githubusercontent.com/72771774/139525991-082d843b-553f-4320-8a24-2321426b7fa4.png)
 
 ## No 4
 ### Soal
 Buat juga reverse domain untuk domain utama
 ### Penjelasan Jawaban
+- Tambahkan konfigurasi di bawah ini ke dalam `/etc/bind/named.conf.local`
+`zone "2.193.192.in-addr.arpa" {
+    type master;
+    file "/etc/bind/kaizoku/2.193.192.in-addr.arpa";
+};`
+- Copy file db.local ke 2.40.10.in-addr.arpa dengan command `cp /etc/bind/db.local /etc/bind/kaizoku/2.40.10.in-addr.arpa` atau bisa langsung di setup. Keterangan 2.193.192 adalah 3 byte pertama IP EniesLobby yang dibalik urutan penulisannya
+- Lalu edit file `/etc/bind/kaizoku/2.40.10.in-addr.arpa`
+![image](https://user-images.githubusercontent.com/72771774/139525239-5825cfb1-afa0-444e-983c-af4353fc24bd.png)
+- Restart service `service bind9 restart`
+- Testing pada client server
+`// Install package dnsutils
+// Pastikan nameserver di /etc/resolv.conf telah dikembalikan sama dengan nameserver dari Foosha
+apt-get update
+apt-get install dnsutils
+
+//Kembalikan nameserver agar tersambung dengan EniesLobby
+host -t PTR "IP EniesLobby"`
+![image](https://user-images.githubusercontent.com/72771774/139525259-721e0fe0-d8ec-41c0-b6d7-99ce6efb6edb.png)
 
 ## No 5
 ### Soal
 Supaya tetap bisa menghubungi Franky jika server EniesLobby rusak, maka buat Water7 sebagai DNS Slave untuk domain utama
 ### Penjelasan Jawaban
+#### EniesLobby
+- Edit file `/etc/bind/named.conf.local`
+`zone "franky.D03.com" {
+    type master;
+    notify yes;
+    also-notify { 192.193.2.3; }; // Masukan IP Water7 
+    allow-transfer { 192.193.2.3; }; // Masukan IP Water7 
+    file "/etc/bind/kaizoku/franky.D03.com";
+};`
+![image](https://user-images.githubusercontent.com/72771774/139525341-6c045ef6-cd74-4b35-9e6c-5aa07ef06994.png)
+- Restart service `service bind9 restart`
+#### Water7
+- Edit file `/etc/bind/named.conf.local`. Keterangan : jangan lupa install bin9 dengan `apt-get install bind9 -y`.
+`zone "franky.D03.com" {
+    type slave;
+    masters { 192.193.2.2; }; // Masukan IP EniesLobby 
+    file "/var/lib/bind/franky.D03.com";
+};`
+![image](https://user-images.githubusercontent.com/72771774/139525423-abe7a9d6-2195-4990-b0e9-1edce0b05d41.png)
+- Restart service `service bind9 restart`
+### Testing 
+- stop service bin9 pada EniesLobby `service bind9 stop`
+- Pastikan pengaturan nameserver pada `/etc/resolv.conf` mengarah ke IP EniesLobby dan IP Water7 di dalam client servernya
+- Ping franky.D03.com 
+![image](https://user-images.githubusercontent.com/72771774/139525544-bbd34ad1-7c09-47f4-9f40-4ab09ccbe56e.png)
 
 ## No 6
 ### Soal
 Setelah itu terdapat subdomain mecha.franky.yyy.com dengan alias www.mecha.franky.yyy.com yang didelegasikan dari EniesLobby ke Water7 dengan IP menuju ke Skypie dalam folder sunnygo
 ### Penjelasan Jawaban
+#### EniesLobby
+- Edit `/etc/bind/kaizoku/franky.D03.com`
+`
+ns1     IN      A       192.193.2.3 ;IP Water7
+mecha   IN      NS      ns1
+`
+![image](https://user-images.githubusercontent.com/72771774/139525756-d581ea19-1644-4688-94fe-6c2d5e7a3d9b.png)
+- Edit `/etc/bind/named.conf.options` dengan **comment** `dnssec-validation auto;` dan menambahkan `allow-query{any;};`
+- Edit `/etc/bind/named.conf.local`
+`zone "franky.D03.com" {
+    type master;
+    file "/etc/bind/kaizoku/franky.D03.com";
+    allow-transfer { 192.193.2.3; }; // Masukan IP Water7
+};`
+![image](https://user-images.githubusercontent.com/72771774/139525648-bf8e95ab-3b66-437e-959a-fb9260e14220.png)
+- Restart service `service bind9 restart`
+#### Water7
+- Edit `/etc/bind/named.conf.options` dengan **comment** `dnssec-validation auto;` dan menambahkan `allow-query{any;};`
+- Edit `/etc/bind/named.conf.local`
+`zone "mecha.franky.D03.com" {
+        type master;
+        file "/etc/bind/sunnygo/mecha.franky.D03.com";
+};`
+![image](https://user-images.githubusercontent.com/72771774/139525690-19fecb55-c88f-4561-8fd1-57fd8909f59c.png)
+- Membuat folder sunnygo dengan command `mkdir /etc/bind/sunnygo`
+-  Copy file db.local ke mecha.franky.D03.com dengan command `cp /etc/bind/db.local /etc/bind/sunnygo/mecha.franky.D03.com`. Namun, dalam pengerjaan dapat langsung diletakkan ke dalam `setup.sh` pada root
+-  Edit `mecha.franky.D03.com`
+![image](https://user-images.githubusercontent.com/72771774/139525853-d4add5e7-74c6-4f5d-a3f7-72b5c5829d60.png)
+-  Restart service `service bind9 restart`
+#### Testing
+![image](https://user-images.githubusercontent.com/72771774/139525909-4321c099-3312-43e4-91f0-c35f308a176c.png)
 
 ## No 7
 ### Soal
 Untuk memperlancar komunikasi Luffy dan rekannya, dibuatkan subdomain melalui Water7 dengan nama general.mecha.franky.yyy.com dengan alias www.general.mecha.franky.yyy.com yang mengarah ke Skypie
 ### Penjelasan Jawaban
+- Edit `mecha.franky.D03.com` pada Water7
+![image](https://user-images.githubusercontent.com/72771774/139525923-db9d797a-186e-42ff-98eb-dc34da872544.png)
+- Restart service `service bind9 restart`
+- Testing pada client server
+![image](https://user-images.githubusercontent.com/72771774/139526218-b8774384-a808-4171-a09d-1ab6cb706ec4.png)
 
 ## No 8
 ### Soal
