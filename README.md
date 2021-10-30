@@ -142,6 +142,16 @@ Hasil website dibuka di client Loguetown dengan `lynx www.super.franky.D03.com/t
 ### Soal
 Luffy juga meminta Nami untuk dibuatkan konfigurasi virtual host. Virtual host ini bertujuan untuk dapat mengakses file asset www.super.franky.yyy.com/public/js menjadi www.super.franky.yyy.com/js
 ### Penjelasan Jawaban
+Buka kembali file `/etc/apache2/sites-available/super.franky.D03.com.conf` dan tambahkan:
+```bash
+Alias "/js" "/var/www/super.franky.D03.com/public/js"
+```
+menjadi seperti berikut:
+![image](https://user-images.githubusercontent.com/29938033/139524024-e2d3d0b5-399d-4c62-b3b6-c50bd8b9f57b.png)
+Kemudian restart webserver dengan command `service apache2 restart`.
+
+Tampilan website ketika dibuka di client Loguetown dengan `lynx www.super.franky.D03.com/js`:
+![image](https://user-images.githubusercontent.com/29938033/139524131-26ddefbc-6c02-4fd9-9570-525daf2ce7a8.png)
 
 ## No 14
 ### Soal
