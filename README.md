@@ -157,6 +157,32 @@ Tampilan website ketika dibuka di client Loguetown dengan `lynx www.super.franky
 ### Soal
 Dan Luffy meminta untuk web www.general.mecha.franky.yyy.com hanya bisa diakses dengan port 15000 dan port 15500
 ### Penjelasan Jawaban
+di dfolder `/etc/apache2/sites-available/`, copy file `000-default.conf` menjadi `general.mecha.franky.D03.com.conf` lalu ubah tag pembuka `VirtualHost` menjadi:
+```bash
+<VirtualHost *:15000 *:15500>
+```
+Ubah juga nilai `DocumentRoot` dan tambahkan nilai `ServerName` dan `ServerAlias` menjadi:
+```bash
+ServerAdmin webmaster@localhost
+DocumentRoot /var/www/general.mecha.franky.D03.com
+ServerName general.mecha.franky.D03.com
+ServerAlias www.general.mecha.franky.D03.com
+```
+Sehingga file confignya menjadi seperti berikut:
+![image](https://user-images.githubusercontent.com/29938033/139524406-57bc8fa7-788b-4ab4-8e8d-ba0852ca187a.png)
+
+Kemudian buka file `/etc/apache2/ports.conf` dan tambahkan:
+```bash
+Listen 15000
+Listen 15500
+```
+sehingga filenya menjadi seperti berikut:
+![image](https://user-images.githubusercontent.com/29938033/139524549-96d010c1-ef1d-4ed7-8c50-44b964aed29a.png)
+Kemudian restart webserver dengan command `service apache2 restart`.
+
+Tampilan website ketika dibuka di client Loguetown dengan `lynx www.general.mecha.franky.D03.com:15000`:
+![image](https://user-images.githubusercontent.com/29938033/139524510-dcbcaad4-7689-4098-850b-bbb7962b6a3d.png)
+
 
 ## No 15
 ### Soal
