@@ -226,3 +226,32 @@ Tampilan website ketika dibuka di client Loguetown dengan `lynx 192.193.2.4`:
 ### Soal
 Dikarenakan Franky juga ingin mengajak temannya untuk dapat menghubunginya melalui website www.super.franky.yyy.com, dan dikarenakan pengunjung web server pasti akan bingung dengan randomnya images yang ada, maka Franky juga meminta untuk mengganti request gambar yang memiliki substring “franky” akan diarahkan menuju franky.png
 ### Penjelasan Jawaban
+Buat file .htaccess di dalam `/var/www/super.franky.D03.com` kemudian isikan dengan:
+```Bash
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !franky.png
+RewriteRule ^public/images/.*franky.*$ /public/images/franky.png [NC,L]
+```
+Seperti di gambar berikut:
+![image](https://user-images.githubusercontent.com/29938033/139525003-adfac9d2-e7c4-42f5-9f57-8525ad533341.png)
+Jika belum mengaktifkan modul rewrite, aktifkan dengan command `a2enmod rewrite`
+
+Buka file `/etc/apache2/sites-available/super.franky.D03.com.conf` dan tambahkan:
+```Bash
+<Directory /var/www/super.franky.D03.com>
+    Options +FollowSymLinks -Multiviews
+    AllowOverride All
+</Directory>
+```
+sehingga isi filenya menjadi seperti berikut:
+![image](https://user-images.githubusercontent.com/29938033/139525063-26f7dbf2-0b29-49a6-9f57-fe5d2ae55e65.png)
+Terakhir, restart kembali webserver dengan command `service apache2 restart`
+
+Mendownload gambar `franky.png` di client Loguetown dengan `lynx www.super.franky.D03.com/public/images/franky.png`:
+![image](https://user-images.githubusercontent.com/29938033/139525154-3066a5d9-12bd-4647-b6d0-ac1267c0fcc4.png)
+Mendownload gambar `not-franky.jpg` di client Loguetown dengan `lynx www.super.franky.D03.com/public/images/not-franky.jpg`:
+![image](https://user-images.githubusercontent.com/29938033/139525192-32cfa574-6d7c-44a0-9604-eac4aca61205.png)
+Membandingkan kedua gambar dengan command `diff franky.png not-franky.jpg && echo gambar sama`
+![image](https://user-images.githubusercontent.com/29938033/139525282-239eea24-5162-490e-a134-6c4dc6eafa64.png)
+Kedua gambar tersebut sama sehingga berarti dua url tadi sudah mengarah ke gambar yang sama, yaitu `franky.png`
