@@ -178,7 +178,7 @@ Listen 15500
 ```
 sehingga filenya menjadi seperti berikut:
 ![image](https://user-images.githubusercontent.com/29938033/139524549-96d010c1-ef1d-4ed7-8c50-44b964aed29a.png)
-Kemudian restart webserver dengan command `service apache2 restart`.
+Aktifkan website dengan menjalankan `a2ensite general.mecha.franky.D03.com` dan kemudian restart webserver dengan command `service apache2 restart`.
 
 Tampilan website ketika dibuka di client Loguetown dengan `lynx www.general.mecha.franky.D03.com:15000`:
 ![image](https://user-images.githubusercontent.com/29938033/139524510-dcbcaad4-7689-4098-850b-bbb7962b6a3d.png)
