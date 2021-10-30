@@ -157,7 +157,7 @@ Tampilan website ketika dibuka di client Loguetown dengan `lynx www.super.franky
 ### Soal
 Dan Luffy meminta untuk web www.general.mecha.franky.yyy.com hanya bisa diakses dengan port 15000 dan port 15500
 ### Penjelasan Jawaban
-di dfolder `/etc/apache2/sites-available/`, copy file `000-default.conf` menjadi `general.mecha.franky.D03.com.conf` lalu ubah tag pembuka `VirtualHost` menjadi:
+di folder `/etc/apache2/sites-available/`, copy file `000-default.conf` menjadi `general.mecha.franky.D03.com.conf` lalu ubah tag pembuka `VirtualHost` menjadi:
 ```bash
 <VirtualHost *:15000 *:15500>
 ```
@@ -183,11 +183,29 @@ Kemudian restart webserver dengan command `service apache2 restart`.
 Tampilan website ketika dibuka di client Loguetown dengan `lynx www.general.mecha.franky.D03.com:15000`:
 ![image](https://user-images.githubusercontent.com/29938033/139524510-dcbcaad4-7689-4098-850b-bbb7962b6a3d.png)
 
-
 ## No 15
 ### Soal
 dengan autentikasi username luffy dan password onepiece dan file di /var/www/general.mecha.franky.yyy
 ### Penjelasan Jawaban
+Buatlah file `.htpasswd` yang akan menyimpan username dan password dengan command `htpasswd -b -c "/etc/apache2/.htpasswd" luffy onepiece`
+Kemudian buka kembali file `/etc/apache2/sites-available/general.mecha.franky.D03.com.conf` dan tambahkan:
+```bash
+<Directory "/var/www/general.mecha.franky.D03.com">
+    AuthType Basic
+    AuthName "Restricted Content"
+    AuthUserFile /etc/apache2/.htpasswd
+    Require valid-user
+</Directory>
+```
+sehingga filenya menjadi seperti berikut:
+![image](https://user-images.githubusercontent.com/29938033/139524683-3d3af9e7-1209-4f5f-a4ff-7639998dcd71.png)
+Kemudian restart kembali webserver dengan `service apache2 restart`
+
+Tampilan website ketika dibuka di client Loguetown dengan `lynx www.general.mecha.franky.D03.com:15000`:
+![image](https://user-images.githubusercontent.com/29938033/139524702-d74b5449-b15f-4003-8ede-d67c9d0eeb27.png)
+![image](https://user-images.githubusercontent.com/29938033/139524721-ac301a6c-9adf-442c-b8f5-332bcd38b7b2.png)
+![image](https://user-images.githubusercontent.com/29938033/139524728-c30fb6d4-7b4f-4ce8-be9a-57ea70ce7ec9.png)
+website akan meminta username dan password sebelum membuka directory
 
 ## No 16
 ### Soal
